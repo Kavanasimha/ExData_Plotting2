@@ -1,0 +1,11 @@
+NEI <- readRDS('summarySCC_PM25.rds')
+SCC <- readRDS('Source_Classification_Code.rds')
+library(ggplot2)
+veh <- as.character(SCC$SCC[grepl('Vehicle', SCC$SCC.Level.Two)])
+v <- NEI[NEI$SCC %in% veh & NEI$fips %in% c('24510','06037'),]
+v$city <- ifelse(v$fips=='24510','Baltimore City','Los Angeles County')
+v5 <- aggregate(Emissions ~ year + city, v, sum)
+v5$change <- ave(v5$Emissions, v5$city, FUN=function(x) x - x[1])
+png('plot6.png',640,480)
+print(ggplot(v5, aes(factor(year), change)) + geom_bar(stat='identity') + facet_wrap(~city) + labs(x='Year', y='Change in PM2.5 vs 1999 (tons)', title='Motor vehicle PM2.5 change since 1999'))
+dev.off()

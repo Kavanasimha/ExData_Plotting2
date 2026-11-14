@@ -1,0 +1,8 @@
+NEI <- readRDS('summarySCC_PM25.rds')
+SCC <- readRDS('Source_Classification_Code.rds')
+library(ggplot2)
+coal <- as.character(SCC$SCC[grepl('Fuel Comb.*Coal', SCC$EI.Sector)])
+c4 <- aggregate(Emissions ~ year, NEI[NEI$SCC %in% coal,], sum)
+png('plot4.png',480,480)
+print(ggplot(c4, aes(factor(year), Emissions/1e3)) + geom_bar(stat='identity') + labs(x='Year', y='PM2.5 emissions (thousand tons)', title='US coal combustion-related PM2.5'))
+dev.off()
